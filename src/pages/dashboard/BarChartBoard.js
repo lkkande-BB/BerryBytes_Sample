@@ -3,64 +3,30 @@ import { connect } from 'react-redux';
 import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { getBarChartData } from '../../store/barchartdata/actions'
 
-
-const data = [
-    {
-        id : 1,
-        customerId: 1,
-        customerName: "test 1",
-        saleAmount: 100 
-    },
-    {
-        id : 2,
-        customerId: 2,
-        customerName: "test 2",
-        saleAmount: 20 
-    },
-    {
-        id : 3,
-        customerId: 2,
-        customerName: "test 2",
-        saleAmount: 100 
-    },
-    {
-        id : 4,
-        customerId: 3,
-        customerName: "test 3",
-        saleAmount: 100 
-    },
-    {
-        id : 5,
-        customerId: 3,
-        customerName: "test 3",
-        saleAmount: 100 
-    }
-]
-
 class BarChartBoard extends Component {
     constructor(props){
       super(props);
       this.state = {
-        finalData: []
       }
     }
 
     componentDidMount(){
-        this.props.getBarChartData();
-        this.setSampleData();
+        this.props.getBarChartData(1000);
     }
 
-    setSampleData = () =>{
+    getConvertedData = (data) => {
         if(data)
         {
-            const arr = []   
+            let arr = []   
             data.map((item) => {
                 if(arr && arr.length > 0)
                 {
                     let currentItemIndex = arr.findIndex(x => x.customerId == item.customerId)
                     if(currentItemIndex > -1)
                     {
-                        arr[currentItemIndex].saleAmount = arr[currentItemIndex].saleAmount + item.saleAmount;
+                        let val = arr[currentItemIndex].sale_amount;
+                        val = val + item.sale_amount;
+                        arr[currentItemIndex].sale_amount = val;
                     }
                     else
                     {
@@ -72,10 +38,7 @@ class BarChartBoard extends Component {
                 }
             })
 
-            
-            this.setState({
-                finalData : arr
-            })
+            return arr;
         }
     }
 
@@ -83,13 +46,13 @@ class BarChartBoard extends Component {
         return (
             <div>
                 Bar Chart : 
-                <BarChart width={730} height={250} data={this.state.finalData}>
+                <BarChart width={1000} height={250} data={ this.getConvertedData(this.props.barChartDetails)}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="customerName" />
-                    <YAxis dataKey="saleAmount"/>
+                    <XAxis dataKey="customer_name" />
+                    <YAxis dataKey="sale_amount"/>
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="saleAmount" fill="#8884d8" />
+                    <Bar dataKey="sale_amount" fill="#8884d8" />
                 </BarChart>
             </div>
         );
@@ -97,12 +60,12 @@ class BarChartBoard extends Component {
 }
 
 const mapStateToProps = state => ({
-  
+    barChartDetails: state.BarChart.barChartDetails
 })
 
 const mapDispatchtoProps = dispatch => {
   return {
-        getBarChartData: () => dispatch(getBarChartData())
+        getBarChartData: (count) => dispatch(getBarChartData(count))
     }
 }
 
